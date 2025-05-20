@@ -1,17 +1,5 @@
 return {
-	{
-		enabled = false,
-		"folke/flash.nvim",
-		---@type Flash.Config
-		opts = {
-			search = {
-				forward = true,
-				multi_window = false,
-				wrap = false,
-				incremental = true,
-			},
-		},
-	},
+	-- Flash.nvim is configured at the end of this file
 
 	{
 		"echasnovski/mini.hipatterns",
@@ -220,6 +208,21 @@ return {
 	},
 
 	{
+		"lewis6991/gitsigns.nvim",
+		event = "BufReadPre",
+		opts = {
+			signs = {
+				add = { text = "" },
+				change = { text = "" },
+				delete = { text = "" },
+				topdelete = { text = "" },
+				changedelete = { text = "" },
+				untracked = { text = "" },
+			},
+		},
+	},
+
+	{
 		"kazhala/close-buffers.nvim",
 		event = "VeryLazy",
 		keys = {
@@ -254,5 +257,20 @@ return {
 				},
 			},
 		},
+	},
+
+	{
+		"folke/flash.nvim",
+		event = "VeryLazy",
+		---@type Flash.Config
+		opts = {},
+  -- stylua: ignore
+  keys = {
+    { "<c-s>", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+    { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+    { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+    { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+    { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+  },
 	},
 }
