@@ -1,22 +1,27 @@
 function ColorMyPencils(color)
-	color = color or "gruvbox"
+	color = color or "rose-pine"
 	vim.cmd.colorscheme(color)
 end
 
 return {
 	{
-		"ellisonleao/gruvbox.nvim",
+		"rose-pine/neovim",
+		name = "rose-pine",
 		priority = 1000,
-		config = function()
-			require("gruvbox").setup({
-				contrast = "hard",
-				palette_overrides = {},
-				overrides = {
-					Normal = { bg = "#FFFFFF" }, -- White background
-					NormalFloat = { bg = "#FFFFFF" }, -- White background for floating windows
-				}
-			})
-			vim.cmd("colorscheme gruvbox")
+		opts = {
+			variant = "auto",
+			dark_variant = "main",
+			disable_background = true,
+			disable_float_background = true,
+			styles = {
+				bold = true,
+				italic = false,
+				transparency = true,
+			},
+		},
+		config = function(_, opts)
+			require("rose-pine").setup(opts)
+			vim.cmd("colorscheme rose-pine")
 			ColorMyPencils()
 		end,
 	},

@@ -78,3 +78,41 @@ end)
 vim.api.nvim_create_user_command("ToggleAutoformat", function()
 	require("craftzdog.lsp").toggleAutoformat()
 end, {})
+
+-- Custom bracket navigation
+keymap.set("n", "<C-h>", "{", opts)
+keymap.set("n", "<C-j>", "[", opts)
+keymap.set("n", "<C-k>", "]", opts)
+keymap.set("n", "<C-l>", "}", opts)
+keymap.set("v", "<C-h>", "{", opts)
+keymap.set("v", "<C-j>", "[", opts)
+keymap.set("v", "<C-k>", "]", opts)
+keymap.set("v", "<C-l>", "}", opts)
+keymap.set("i", "<C-h>", function() 
+  vim.api.nvim_feedkeys("{}", "n", false)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Left>", true, false, true), "n", false)
+end, opts)
+keymap.set("i", "<C-j>", function() 
+  vim.api.nvim_feedkeys("[]", "n", false)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Left>", true, false, true), "n", false)
+end, opts)
+keymap.set("i", "<C-k>", function()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  local line = vim.api.nvim_get_current_line()
+  local next_char = line:sub(col + 1, col + 1)
+  if next_char == "]" then
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Right>", true, false, true), "n", false)
+  else
+    vim.api.nvim_feedkeys("]", "n", false)
+  end
+end, opts)
+keymap.set("i", "<C-l>", function()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  local line = vim.api.nvim_get_current_line()
+  local next_char = line:sub(col + 1, col + 1)
+  if next_char == "}" then
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Right>", true, false, true), "n", false)
+  else
+    vim.api.nvim_feedkeys("}", "n", false)
+  end
+end, opts)

@@ -83,79 +83,82 @@ return {
 	-- filename
 	{
 		"b0o/incline.nvim",
-		dependencies = { "craftzdog/solarized-osaka.nvim" },
-		event = "BufReadPre",
-		priority = 1200,
-		config = function()
-			local colors = require("solarized-osaka.colors").setup()
-			require("incline").setup({
-				highlight = {
-					groups = {
-						InclineNormal = { guibg = colors.magenta500, guifg = colors.base04 },
-						InclineNormalNC = { guifg = colors.violet500, guibg = colors.base03 },
-					},
-				},
-				window = { margin = { vertical = 0, horizontal = 1 } },
-				hide = {
-					cursorline = true,
-				},
-				render = function(props)
-					local filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(props.buf), ":t")
-					if vim.bo[props.buf].modified then
-						filename = "[+] " .. filename
-					end
-					local icon, color = require("nvim-web-devicons").get_icon_color(filename)
-					return { { icon, guifg = color }, { " " }, { filename } }
-				end,
-			})
-		end,
+		enabled = false,
 	},
 	-- statusline
 	{
 		"nvim-lualine/lualine.nvim",
 		opts = function(_, opts)
 			local LazyVim = require("lazyvim.util")
-			-- Custom soft pink theme
-			local custom_theme = {
+			-- Catppuccin Frappe theme with pure black background
+			local catppuccin_colors = {
+				rosewater = "#F2D5CF",
+				flamingo = "#EEBEBE",
+				pink = "#F4B8E4",
+				mauve = "#CA9EE6",
+				red = "#E78284",
+				maroon = "#EA999C",
+				peach = "#EF9F76",
+				yellow = "#E5C890",
+				green = "#A6D189",
+				teal = "#81C8BE",
+				sky = "#99D1DB",
+				sapphire = "#85C1DC",
+				blue = "#8CAAEE",
+				lavender = "#BABBF1",
+				text = "#C6D0F5",
+				subtext1 = "#B5BFE2",
+				subtext0 = "#A5ADCE",
+				overlay2 = "#949CBB",
+				overlay1 = "#838BA7",
+				overlay0 = "#737994",
+				surface2 = "#626880",
+				surface1 = "#51576D",
+				surface0 = "#414559",
+				base = "#000000", -- Changed to pure black
+				mantle = "#000000", -- Changed to pure black
+				crust = "#000000", -- Changed to pure black
+			}
+
+			local catppuccin_frappe = {
 				normal = {
-					a = { fg = "#000000", bg = "#f8bbd0" }, -- Soft pink background
-					b = { fg = "#f8bbd0", bg = "#282828" }, -- Soft pink text on dark gray
-					c = { fg = "#ffcdd2", bg = "#282828" }, -- Very light pink text on dark gray
+					a = { fg = catppuccin_colors.base, bg = catppuccin_colors.blue },
+					b = { fg = catppuccin_colors.text, bg = catppuccin_colors.base },
+					c = { fg = catppuccin_colors.text, bg = catppuccin_colors.base },
 				},
 				insert = {
-					a = { fg = "#000000", bg = "#f48fb1" }, -- Medium soft pink for insert mode
-					b = { fg = "#f48fb1", bg = "#282828" }, -- Medium soft pink text on dark gray
+					a = { fg = catppuccin_colors.base, bg = catppuccin_colors.green },
+					b = { fg = catppuccin_colors.text, bg = catppuccin_colors.base },
 				},
 				visual = {
-					a = { fg = "#000000", bg = "#e1bee7" }, -- Soft lavender for visual mode
-					b = { fg = "#e1bee7", bg = "#282828" }, -- Soft lavender text on dark gray
+					a = { fg = catppuccin_colors.base, bg = catppuccin_colors.mauve },
+					b = { fg = catppuccin_colors.text, bg = catppuccin_colors.base },
 				},
 				replace = {
-					a = { fg = "#000000", bg = "#ec407a" }, -- Medium pink for replace mode
-					b = { fg = "#ec407a", bg = "#282828" }, -- Medium pink text on dark gray
+					a = { fg = catppuccin_colors.base, bg = catppuccin_colors.red },
+					b = { fg = catppuccin_colors.text, bg = catppuccin_colors.base },
 				},
 				command = {
-					a = { fg = "#000000", bg = "#f5ccd4" }, -- Very soft pink for command mode
-					b = { fg = "#f5ccd4", bg = "#282828" }, -- Very soft pink text on dark gray
+					a = { fg = catppuccin_colors.base, bg = catppuccin_colors.peach },
+					b = { fg = catppuccin_colors.text, bg = catppuccin_colors.base },
 				},
 				inactive = {
-					a = { fg = "#c0c0c0", bg = "#383838" }, -- Gray when inactive
-					b = { fg = "#c0c0c0", bg = "#383838" }, -- Gray when inactive
-					c = { fg = "#c0c0c0", bg = "#383838" }, -- Gray when inactive
+					a = { fg = catppuccin_colors.overlay0, bg = catppuccin_colors.base },
+					b = { fg = catppuccin_colors.overlay0, bg = catppuccin_colors.base },
+					c = { fg = catppuccin_colors.overlay0, bg = catppuccin_colors.base },
 				},
 			}
+			
 			opts.options = opts.options or {}
-			opts.options.theme = custom_theme
-			opts.sections.lualine_c[4] = {
-				LazyVim.lualine.pretty_path({
-					length = 0,
-					relative = "cwd",
-					modified_hl = "MatchParen",
-					directory_hl = "",
-					filename_hl = "Bold",
-					modified_sign = "",
-					readonly_icon = " 󰌾 ",
-				}),
+			opts.options.theme = catppuccin_frappe
+			-- Custom sections: mode + branch + diagnostics on left
+			opts.sections = {
+				lualine_a = { "mode" },
+				lualine_b = { "branch" },
+				lualine_c = { "diagnostics" },
+				lualine_x = {},
+				lualine_y = {},
+				lualine_z = {},
 			}
 		end,
 	},

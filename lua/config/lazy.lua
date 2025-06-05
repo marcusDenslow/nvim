@@ -18,7 +18,7 @@ require("lazy").setup({
 			"LazyVim/LazyVim",
 			import = "lazyvim.plugins",
 			opts = {
-				colorscheme = "gruvbox",
+				colorscheme = "catppuccin",
 				news = {
 					lazyvim = true,
 					neovim = true,
@@ -54,7 +54,7 @@ require("lazy").setup({
 	dev = {
 		path = "~/.ghq/github.com",
 	},
-	checker = { enabled = true }, -- automatically check for plugin updates
+	checker = { enabled = false }, -- disable automatic plugin update notifications
 	performance = {
 		cache = {
 			enabled = true,
