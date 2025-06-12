@@ -256,8 +256,14 @@ return {
 					winblend = vim.o.pumblend,
 				},
 			},
+			keymap = {
+				preset = "enter",
+				["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+				["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+			},
 		},
 	},
+
 
 	{
 		"folke/flash.nvim",

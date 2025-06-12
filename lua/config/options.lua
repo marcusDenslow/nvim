@@ -12,10 +12,11 @@ vim.opt.hlsearch = true
 vim.opt.backup = false
 vim.opt.showcmd = true
 vim.opt.cmdheight = 1
-vim.opt.laststatus = 3
+vim.opt.laststatus = 2
+vim.opt.showmode = true
 vim.opt.expandtab = false
 vim.opt.scrolloff = 10
-vim.opt.shell = "fish"
+vim.opt.shell = "zsh"
 vim.opt.backupskip = { "/tmp/*", "/private/tmp/*" }
 vim.opt.inccommand = "split"
 vim.opt.ignorecase = true -- Case insensitive searching UNLESS /C or capital in search
@@ -32,7 +33,11 @@ vim.opt.splitright = true -- Put new windows right of current
 vim.opt.splitkeep = "cursor"
 vim.opt.mouse = ""
 vim.opt.list = false
-vim.opt.guicursor = "n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50"
+
+vim.opt.syntax = "on"
+vim.cmd("syntax enable")
+vim.cmd("filetype plugin indent on")
+-- vim.opt.guicursor = "n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250"
 vim.opt.cursorline = false
 
 -- Undercurl
@@ -45,9 +50,9 @@ vim.opt.formatoptions:append({ "r" })
 vim.cmd([[au BufNewFile,BufRead *.astro setf astro]])
 vim.cmd([[au BufNewFile,BufRead Podfile setf ruby]])
 
-if vim.fn.has("nvim-0.8") == 1 then
-	vim.opt.cmdheight = 0
-end
+-- if vim.fn.has("nvim-0.8") == 1 then
+-- 	vim.opt.cmdheight = 1
+-- end
 
 -- File types
 vim.filetype.add({
@@ -60,3 +65,26 @@ vim.g.lazyvim_prettier_needs_config = true
 vim.g.lazyvim_picker = "telescope"
 vim.g.lazyvim_cmp = "blink.cmp"
 
+vim.diagnostic.config({
+	virtual_text = false,
+	signs = false,
+	underline = false,
+	update_in_insert = false,
+	severity_sort = false,
+})
+
+-- Custom mode display that shows NORMAL
+local function show_mode()
+	local mode = vim.api.nvim_get_mode().mode
+	if mode == "n" then
+		vim.cmd('echohl ModeMsg | echo "--NORMAL--" | echohl None')
+	end
+end
+
+vim.api.nvim_create_autocmd({ "ModeChanged", "CursorMoved" }, {
+	callback = function()
+		if vim.api.nvim_get_mode().mode == "n" then
+			vim.defer_fn(show_mode, 10)
+		end
+	end,
+})

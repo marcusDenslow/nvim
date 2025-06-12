@@ -23,6 +23,40 @@ keymap.set("n", "k", "j", { noremap = true })
 keymap.set("v", "j", "k", { noremap = true })
 keymap.set("v", "k", "j", { noremap = true })
 
+local harpoon = require("harpoon")
+
+-- REQUIRED
+harpoon:setup()
+-- REQUIRED
+
+vim.keymap.set("n", "<leader>a", function()
+	harpoon:list():add()
+end)
+vim.keymap.set("n", "<C-e>", function()
+	harpoon.ui:toggle_quick_menu(harpoon:list())
+end)
+
+vim.keymap.set("n", "<C-h>", function()
+	harpoon:list():select(1)
+end)
+vim.keymap.set("n", "<C-t>", function()
+	harpoon:list():select(2)
+end)
+vim.keymap.set("n", "<C-n>", function()
+	harpoon:list():select(3)
+end)
+vim.keymap.set("n", "<C-s>", function()
+	harpoon:list():select(4)
+end)
+
+-- Toggle previous & next buffers stored within Harpoon list
+vim.keymap.set("n", "<C-S-P>", function()
+	harpoon:list():prev()
+end)
+vim.keymap.set("n", "<C-S-N>", function()
+	harpoon:list():next()
+end)
+
 -- Increment/decrement
 keymap.set("n", "+", "<C-a>")
 keymap.set("n", "-", "<C-x>")
@@ -88,31 +122,31 @@ keymap.set("v", "<C-h>", "{", opts)
 keymap.set("v", "<C-j>", "[", opts)
 keymap.set("v", "<C-k>", "]", opts)
 keymap.set("v", "<C-l>", "}", opts)
-keymap.set("i", "<C-h>", function() 
-  vim.api.nvim_feedkeys("{}", "n", false)
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Left>", true, false, true), "n", false)
+keymap.set("i", "<C-h>", function()
+	vim.api.nvim_feedkeys("{}", "n", false)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Left>", true, false, true), "n", false)
 end, opts)
-keymap.set("i", "<C-j>", function() 
-  vim.api.nvim_feedkeys("[]", "n", false)
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Left>", true, false, true), "n", false)
+keymap.set("i", "<C-j>", function()
+	vim.api.nvim_feedkeys("[]", "n", false)
+	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Left>", true, false, true), "n", false)
 end, opts)
 keymap.set("i", "<C-k>", function()
-  local col = vim.api.nvim_win_get_cursor(0)[2]
-  local line = vim.api.nvim_get_current_line()
-  local next_char = line:sub(col + 1, col + 1)
-  if next_char == "]" then
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Right>", true, false, true), "n", false)
-  else
-    vim.api.nvim_feedkeys("]", "n", false)
-  end
+	local col = vim.api.nvim_win_get_cursor(0)[2]
+	local line = vim.api.nvim_get_current_line()
+	local next_char = line:sub(col + 1, col + 1)
+	if next_char == "]" then
+		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Right>", true, false, true), "n", false)
+	else
+		vim.api.nvim_feedkeys("]", "n", false)
+	end
 end, opts)
 keymap.set("i", "<C-l>", function()
-  local col = vim.api.nvim_win_get_cursor(0)[2]
-  local line = vim.api.nvim_get_current_line()
-  local next_char = line:sub(col + 1, col + 1)
-  if next_char == "}" then
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Right>", true, false, true), "n", false)
-  else
-    vim.api.nvim_feedkeys("}", "n", false)
-  end
+	local col = vim.api.nvim_win_get_cursor(0)[2]
+	local line = vim.api.nvim_get_current_line()
+	local next_char = line:sub(col + 1, col + 1)
+	if next_char == "}" then
+		vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Right>", true, false, true), "n", false)
+	else
+		vim.api.nvim_feedkeys("}", "n", false)
+	end
 end, opts)

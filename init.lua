@@ -9,6 +9,8 @@ vim.print = _G.dd
 
 require("config.lazy")
 
+vim.opt.guicursor = "n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250"
+
 vim.keymap.set("i", "kj", "<Esc>", { noremap = true })
 vim.keymap.set("v", "kj", "<Esc>", { noremap = true })
 -- Swap up and down arrow keys

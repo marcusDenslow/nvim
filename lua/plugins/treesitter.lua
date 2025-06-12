@@ -8,6 +8,7 @@ return {
 				"astro",
 				"cmake",
 				"cpp",
+				"c",
 				"css",
 				"fish",
 				"gitignore",
@@ -20,6 +21,12 @@ return {
 				"scss",
 				"sql",
 				"svelte",
+			},
+
+			-- Force highlighting to be enabled
+			highlight = {
+				enable = true,
+				additional_vim_regex_highlighting = false,
 			},
 
 			-- matchup = {
@@ -62,6 +69,21 @@ return {
 				},
 			})
 			vim.treesitter.language.register("markdown", "mdx")
+
+			-- Force treesitter to start on buffer events
+			vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile", "BufEnter" }, {
+				callback = function()
+					local buf = vim.api.nvim_get_current_buf()
+					-- Force filetype detection
+					vim.bo[buf].filetype = vim.bo[buf].filetype
+					-- Force treesitter to start if available
+					if vim.treesitter.highlighter.active[buf] == nil then
+						vim.defer_fn(function()
+							pcall(vim.treesitter.start, buf)
+						end, 50)
+					end
+				end,
+			})
 		end,
 	},
 }

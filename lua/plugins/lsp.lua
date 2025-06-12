@@ -141,7 +141,7 @@ return {
 							format = {
 								enable = false,
 								defaultConfig = {
-									indent_style = "space",
+									indent_style = "tab",
 									ndent_size = "4",
 									continuation_indent_size = "4",
 								},
