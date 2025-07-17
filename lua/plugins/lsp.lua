@@ -13,6 +13,7 @@ return {
 				"typescript-language-server",
 				"css-lsp",
 				"clangd",
+				"zls",
 			})
 		end,
 	},
@@ -84,6 +85,7 @@ return {
 						},
 					},
 				},
+				zls = {},
 				lua_ls = {
 					-- enabled = false,
 					single_file_support = true,
