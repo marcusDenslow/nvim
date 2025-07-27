@@ -154,7 +154,7 @@ return {
 
 			opts.defaults = vim.tbl_deep_extend("force", opts.defaults, {
 				wrap_results = true,
-				layout_strategy = "horizontal",
+				layout_strategy = "vertical",
 				layout_config = { prompt_position = "top" },
 				sorting_strategy = "ascending",
 				winblend = 0,
@@ -163,6 +163,10 @@ return {
 				},
 			})
 			opts.pickers = {
+				find_files = {
+					find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*", "--glob", "!**/.zig-cache/*", "--glob", "!**/zig-out/*" },
+					follow = false,
+				},
 				diagnostics = {
 					theme = "ivy",
 					initial_mode = "normal",

@@ -160,7 +160,12 @@ return {
 				enabled = false,
 				timeout = 3000,
 			},
-			picker = { enabled = true },
+			picker = { 
+				enabled = true,
+				layout = {
+					preset = "bottom"
+				}
+			},
 			quickfile = { enabled = true },
 			scope = { enabled = true },
 			scroll = { enabled = false },
