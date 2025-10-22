@@ -2,7 +2,7 @@ return {
 	-- Flash.nvim is configured at the end of this file
 
 	{
-		"echasnovski/mini.hipatterns",
+		"nvim-mini/mini.hipatterns",
 		event = "BufReadPre",
 		opts = {
 			highlighters = {
@@ -247,29 +247,38 @@ return {
 		},
 	},
 
-	-- {
-	-- 	"saghen/blink.cmp",
-	-- 	opts = {
-	-- 		completion = {
-	-- 			menu = {
-	-- 				winblend = vim.o.pumblend,
-	-- 			},
-	-- 		},
-	-- 		signature = {
-	-- 			enabled = true,
-	-- 			window = {
-	-- 				winblend = vim.o.pumblend,
-	-- 			},
-	-- 		},
-	-- 		keymap = {
-	-- 			preset = "enter",
-	-- 			["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
-	-- 			["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
-	-- 			["<C-n>"] = { "show_signature" },
-	-- 			["<C-p>"] = { "hide_signature" },
-	-- 		},
-	-- 	},
-	-- },
+	{
+		"saghen/blink.cmp",
+		opts = function(_, opts)
+			-- Initialize toggle variable
+			if vim.g.blink_cmp_enabled == nil then
+				vim.g.blink_cmp_enabled = true
+			end
+
+			-- Override enabled function to check toggle
+			opts.enabled = function()
+				return vim.g.blink_cmp_enabled
+			end
+
+			opts.completion = opts.completion or {}
+			opts.completion.menu = opts.completion.menu or {}
+			opts.completion.menu.winblend = vim.o.pumblend
+
+			opts.signature = opts.signature or {}
+			opts.signature.enabled = true
+			opts.signature.window = opts.signature.window or {}
+			opts.signature.window.winblend = vim.o.pumblend
+
+			opts.keymap = opts.keymap or {}
+			opts.keymap.preset = "enter"
+			opts.keymap["<Tab>"] = { "select_next", "snippet_forward", "fallback" }
+			opts.keymap["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" }
+			opts.keymap["<C-n>"] = { "show_signature" }
+			opts.keymap["<C-p>"] = { "hide_signature" }
+
+			return opts
+		end,
+	},
 
 	{
 		"hrsh7th/nvim-cmp",
@@ -278,23 +287,60 @@ return {
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip",
+			"micangl/cmp-vimtex",
 		},
+		event = "InsertEnter",
 		config = function()
 			local cmp = require("cmp")
-			local luasnip = require("luasnip")
+
+			-- Initialize the global toggle state
+			vim.g.cmp_toggle_disabled = false
 
 			cmp.setup({
-				snippet = {
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
+				enabled = function()
+					-- Check if manually disabled
+					if vim.g.cmp_toggle_disabled then
+						return false
+					end
+					-- Disable in select mode (UltiSnips placeholders)
+					local mode = vim.api.nvim_get_mode().mode
+					if mode == "s" or mode == "S" or mode == "\19" then
+						return false
+					end
+					return true
+				end,
+				completion = {
+					autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
 				},
 				mapping = cmp.mapping.preset.insert({
+					["<Tab>"] = cmp.mapping(function(fallback)
+						-- Check if we're in a snippet and can jump forward
+						if vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+							return vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(ultisnips_jump_forward)", true, true, true), 'm', true)
+						end
+
+						if cmp.visible() then
+							cmp.select_next_item()
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+					["<S-Tab>"] = cmp.mapping(function(fallback)
+						-- Check if we're in a snippet and can jump backward
+						if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
+							return vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(ultisnips_jump_backward)", true, true, true), 'm', true)
+						end
+
+						if cmp.visible() then
+							cmp.select_prev_item()
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
 					["<C-d>"] = cmp.mapping.scroll_docs(-4),
 					["<C-f>"] = cmp.mapping.scroll_docs(4),
 					["<C-Space>"] = cmp.mapping.complete(),
+					["<C-y>"] = cmp.mapping.complete(), -- Alternative trigger
 					["<C-e>"] = cmp.mapping.close(),
 					["<CR>"] = cmp.mapping.confirm({
 						behavior = cmp.ConfirmBehavior.Replace,
@@ -302,26 +348,11 @@ return {
 					}),
 					["<C-n>"] = cmp.mapping.select_next_item(),
 					["<C-p>"] = cmp.mapping.select_prev_item(),
-					["<Tab>"] = cmp.mapping(function(fallback)
-						if luasnip.expand_or_jumpable() then
-							luasnip.expand_or_jump()
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-					["<S-Tab>"] = cmp.mapping(function(fallback)
-						if luasnip.jumpable(-1) then
-							luasnip.jump(-1)
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
 				}),
 				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "luasnip" },
-				}, {
-					{ name = "buffer" },
+					{ name = "vimtex", priority = 1000 },
+					{ name = "nvim_lsp", priority = 800 },
+					{ name = "buffer", priority = 500, keyword_length = 3 },
 				}),
 			})
 		end,

@@ -150,3 +150,49 @@ keymap.set("i", "<C-l>", function()
 		vim.api.nvim_feedkeys("}", "n", false)
 	end
 end, opts)
+
+-- Fix last spelling mistake
+keymap.set("n", "<leader>sf", function()
+	-- Save current position
+	local pos = vim.api.nvim_win_get_cursor(0)
+	-- Go to previous misspelled word
+	vim.cmd("normal! [s")
+	-- Fix with first suggestion
+	vim.cmd("normal! 1z=")
+	-- Return to original position (adjusted for any text changes)
+	vim.api.nvim_win_set_cursor(0, pos)
+end, { desc = "Fix last spelling mistake", noremap = true, silent = true })
+
+-- Toggle spell checking
+keymap.set("n", "<leader>ts", function()
+	vim.opt.spell = not vim.opt.spell:get()
+	if vim.opt.spell:get() then
+		print("Spell checking enabled")
+	else
+		print("Spell checking disabled")
+	end
+end, { desc = "Toggle spell checking", noremap = true, silent = true })
+
+-- Toggle blink.cmp completion
+keymap.set("n", "<leader>tc", function()
+	-- Initialize if needed
+	if vim.g.blink_cmp_enabled == nil then
+		vim.g.blink_cmp_enabled = true
+	end
+
+	-- Toggle the state
+	vim.g.blink_cmp_enabled = not vim.g.blink_cmp_enabled
+
+	-- Try to hide any visible menu
+	local ok, blink = pcall(require, "blink.cmp")
+	if ok and blink.is_visible and blink.is_visible() then
+		blink.hide()
+	end
+
+	-- Print status
+	if vim.g.blink_cmp_enabled then
+		print("Blink.cmp enabled")
+	else
+		print("Blink.cmp disabled")
+	end
+end, { desc = "Toggle blink.cmp completion", noremap = true, silent = true })

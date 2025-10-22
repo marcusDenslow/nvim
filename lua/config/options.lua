@@ -3,6 +3,7 @@ vim.g.mapleader = " "
 vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
 
+vim.opt.termguicolors = true
 vim.opt.number = true
 
 vim.opt.title = true
@@ -33,6 +34,11 @@ vim.opt.splitright = true -- Put new windows right of current
 vim.opt.splitkeep = "cursor"
 vim.opt.mouse = ""
 vim.opt.list = false
+vim.opt.fillchars:append({ eob = "~" }) -- Show ~ on empty lines like default vim
+
+-- Spell checking
+vim.opt.spell = true
+vim.opt.spelllang = "en_us"
 
 vim.opt.syntax = "on"
 vim.cmd("syntax enable")
