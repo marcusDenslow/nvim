@@ -1,7 +1,3 @@
-local discipline = require("craftzdog.discipline")
-
-discipline.cowboy()
-
 local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
 
@@ -18,10 +14,6 @@ keymap.set("n", "<Leader>d", '"_d')
 keymap.set("n", "<Leader>D", '"_D')
 keymap.set("v", "<Leader>d", '"_d')
 keymap.set("v", "<Leader>D", '"_D')
-keymap.set("n", "j", "k", { noremap = true })
-keymap.set("n", "k", "j", { noremap = true })
-keymap.set("v", "j", "k", { noremap = true })
-keymap.set("v", "k", "j", { noremap = true })
 
 local harpoon = require("harpoon")
 

@@ -271,10 +271,10 @@ return {
 
 			opts.keymap = opts.keymap or {}
 			opts.keymap.preset = "enter"
-			opts.keymap["<Tab>"] = { "select_next", "snippet_forward", "fallback" }
-			opts.keymap["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" }
-			opts.keymap["<C-n>"] = { "show_signature" }
-			opts.keymap["<C-p>"] = { "hide_signature" }
+			opts.keymap["<C-n>"] = { "select_next", "snippet_forward", "fallback" }
+			opts.keymap["<C-p>"] = { "select_prev", "snippet_backward", "fallback" }
+			opts.keymap["<Tab>"] = { "snippet_forward", "fallback" }
+			opts.keymap["<S-Tab>"] = { "snippet_backward", "fallback" }
 
 			return opts
 		end,
@@ -372,5 +372,88 @@ return {
     { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
     { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
   },
+	},
+
+	{
+		"stevearc/oil.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		lazy = false,
+		opts = {
+			default_file_explorer = true,
+			columns = {
+				"icon",
+			},
+			buf_options = {
+				buflisted = false,
+				bufhidden = "hide",
+			},
+			win_options = {
+				wrap = false,
+				signcolumn = "no",
+				cursorcolumn = false,
+				foldcolumn = "0",
+				spell = false,
+				list = false,
+				conceallevel = 3,
+				concealcursor = "nvic",
+			},
+			skip_confirm_for_simple_edits = true,
+			keymaps = {
+				["g?"] = "actions.show_help",
+				["<CR>"] = "actions.select",
+				["<C-s>"] = { "actions.select", opts = { vertical = true }, desc = "Open the entry in a vertical split" },
+				["<C-h>"] = { "actions.select", opts = { horizontal = true }, desc = "Open the entry in a horizontal split" },
+				["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open the entry in new tab" },
+				["<C-p>"] = "actions.preview",
+				["<C-c>"] = "actions.close",
+				["<C-r>"] = "actions.refresh",
+				["h"] = "actions.parent",
+				["-"] = "actions.parent",
+				["_"] = "actions.open_cwd",
+				["`"] = "actions.cd",
+				["~"] = { "actions.cd", opts = { scope = "tab" }, desc = ":tcd to the current oil directory" },
+				["gs"] = "actions.change_sort",
+				["gx"] = "actions.open_external",
+				["g."] = "actions.toggle_hidden",
+				["g\\"] = "actions.toggle_trash",
+			},
+			use_default_keymaps = true,
+			view_options = {
+				show_hidden = false,
+				is_hidden_file = function(name, bufnr)
+					return vim.startswith(name, ".")
+				end,
+				is_always_hidden = function(name, bufnr)
+					return false
+				end,
+				sort = {
+					{ "type", "asc" },
+					{ "name", "asc" },
+				},
+			},
+			float = {
+				padding = 2,
+				max_width = 90,
+				max_height = 30,
+				border = "rounded",
+				win_options = {
+					winblend = 0,
+				},
+			},
+		},
+		keys = {
+			{
+				"<leader>e",
+				"<cmd>Oil<cr>",
+				desc = "Open parent directory in Oil",
+			},
+			{
+				"<leader>E",
+				function()
+					require("oil").toggle_float()
+				end,
+				desc = "Open Oil in floating window",
+			},
+		},
 	},
 }

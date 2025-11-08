@@ -1,4 +1,10 @@
 return {
+	-- fidget.nvim - LSP progress UI
+	{
+		"j-hui/fidget.nvim",
+		opts = {},
+	},
+
 	-- tools
 	{
 		"mason-org/mason.nvim",
@@ -14,6 +20,7 @@ return {
 				"css-lsp",
 				"clangd",
 				"zls",
+				"rust-analyzer",
 			})
 		end,
 	},
@@ -23,8 +30,25 @@ return {
 		"neovim/nvim-lspconfig",
 		opts = {
 			inlay_hints = { enabled = false },
+			-- Disable virtual_text for tiny-inline-diagnostic
+			diagnostics = {
+				virtual_text = false,
+			},
 			---@type lspconfig.options
 			servers = {
+				["*"] = {
+					keys = {
+						{
+							"gd",
+							function()
+								-- DO NOT RESUSE WINDOW
+								require("telescope.builtin").lsp_definitions({ reuse_win = false })
+							end,
+							desc = "Goto Definition",
+							has = "definition",
+						},
+					},
+				},
 				cssls = {},
 				clangd = {
 					cmd = {
@@ -86,6 +110,15 @@ return {
 					},
 				},
 				zls = {},
+				rust_analyzer = {
+					settings = {
+						["rust-analyzer"] = {
+							cargo = {
+								allFeatures = true,
+							},
+						},
+					},
+				},
 				lua_ls = {
 					-- enabled = false,
 					single_file_support = true,
@@ -154,22 +187,5 @@ return {
 			},
 			setup = {},
 		},
-	},
-	{
-		"neovim/nvim-lspconfig",
-		opts = function()
-			local keys = require("lazyvim.plugins.lsp.keymaps").get()
-			vim.list_extend(keys, {
-				{
-					"gd",
-					function()
-						-- DO NOT RESUSE WINDOW
-						require("telescope.builtin").lsp_definitions({ reuse_win = false })
-					end,
-					desc = "Goto Definition",
-					has = "definition",
-				},
-			})
-		end,
 	},
 }

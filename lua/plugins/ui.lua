@@ -214,13 +214,14 @@ return {
 				end,
 				desc = "Notification History",
 			},
-			{
-				"<leader>e",
-				function()
-					Snacks.explorer()
-				end,
-				desc = "File Explorer",
-			},
+			-- Disabled Snacks.explorer in favor of oil.nvim
+			-- {
+			-- 	"<leader>e",
+			-- 	function()
+			-- 		Snacks.explorer()
+			-- 	end,
+			-- 	desc = "File Explorer",
+			-- },
 			-- find
 			{
 				"<leader>fb",

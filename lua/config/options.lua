@@ -5,6 +5,7 @@ vim.opt.fileencoding = "utf-8"
 
 vim.opt.termguicolors = true
 vim.opt.number = true
+vim.opt.colorcolumn = "80"
 
 vim.opt.title = true
 vim.opt.autoindent = true
@@ -38,7 +39,7 @@ vim.opt.fillchars:append({ eob = "~" }) -- Show ~ on empty lines like default vi
 
 -- Spell checking
 vim.opt.spell = true
-vim.opt.spelllang = "en_us"
+vim.opt.spelllang = "en_us,nb" -- English (US) and Norwegian Bokmål
 
 vim.opt.syntax = "on"
 vim.cmd("syntax enable")
@@ -71,12 +72,9 @@ vim.g.lazyvim_prettier_needs_config = true
 vim.g.lazyvim_picker = "telescope"
 vim.g.lazyvim_cmp = "blink.cmp"
 
+-- Disable virtual_text immediately to prevent conflicts with tiny-inline-diagnostic
 vim.diagnostic.config({
 	virtual_text = false,
-	signs = false,
-	underline = false,
-	update_in_insert = false,
-	severity_sort = false,
 })
 
 -- Custom mode display that shows NORMAL

@@ -3,6 +3,8 @@ return {
 
 	{
 		"nvim-treesitter/nvim-treesitter",
+		build = ":TSUpdate",
+		event = { "BufReadPost", "BufNewFile" },
 		opts = {
 			ensure_installed = {
 				"astro",
@@ -23,6 +25,13 @@ return {
 				"sql",
 				"svelte",
 			},
+			highlight = {
+				enable = true,
+			},
+			indent = {
+				enable = true,
+			},
+			auto_install = true,
 		},
 	},
 }

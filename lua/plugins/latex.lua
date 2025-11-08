@@ -24,9 +24,6 @@ return {
 			vim.g.vimtex_quickfix_mode = 2 -- Open quickfix but don't steal focus
 			vim.g.vimtex_quickfix_open_on_warning = 0 -- Don't open for warnings
 
-			-- PDF viewer settings for forward search
-			vim.g.vimtex_view_general_viewer = "zathura"
-
 			-- Disable some features for faster startup
 			vim.g.vimtex_indent_enabled = 1
 			vim.g.vimtex_syntax_enabled = 1
@@ -50,7 +47,7 @@ return {
 
 			-- Compiler options
 			vim.g.vimtex_compiler_latexmk = {
-				build_dir = "",
+				build_dir = "../pdfs",
 				callback = 1,
 				continuous = 1, -- Auto-recompile on save
 				executable = "latexmk",
@@ -62,6 +59,47 @@ return {
 					"-interaction=nonstopmode",
 				},
 			}
+
+			-- Auto-commit and push tex-notes on successful compilation
+			vim.api.nvim_create_autocmd("User", {
+				pattern = "VimtexEventCompileSuccess",
+				callback = function()
+					local tex_notes_dir = vim.fn.expand("$HOME/Documents/tex-notes")
+					local current_file = vim.fn.expand("%:p")
+
+					-- Check if current file is in tex-notes directory
+					if string.find(current_file, tex_notes_dir, 1, true) then
+						-- Run git commands asynchronously
+						vim.fn.jobstart({
+							"sh",
+							"-c",
+							string.format(
+								[[
+								cd "%s" && \
+								git add . && \
+								git commit -m "Auto-update: $(date '+%%Y-%%m-%%d %%H:%%M:%%S')" && \
+								git push
+								]],
+								tex_notes_dir
+							)
+						}, {
+							on_exit = function(_, exit_code)
+								if exit_code == 0 then
+									vim.notify("✓ LaTeX notes pushed to GitHub", vim.log.levels.INFO)
+								else
+									-- Silently fail if no changes (exit code 1 from git commit)
+									-- Only notify on actual errors
+									if exit_code ~= 1 then
+										vim.notify("✗ Failed to push notes (exit code: " .. exit_code .. ")", vim.log.levels.WARN)
+									end
+								end
+							end,
+							stdout_buffered = true,
+							stderr_buffered = true,
+						})
+					end
+				end,
+			})
 		end,
 	},
 
