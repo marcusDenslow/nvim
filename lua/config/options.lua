@@ -39,7 +39,7 @@ vim.opt.fillchars:append({ eob = "~" }) -- Show ~ on empty lines like default vi
 
 -- Spell checking
 vim.opt.spell = true
-vim.opt.spelllang = "en_us,nb" -- English (US) and Norwegian Bokmål
+vim.opt.spelllang = "en_us" -- English (US)
 
 vim.opt.syntax = "on"
 vim.cmd("syntax enable")

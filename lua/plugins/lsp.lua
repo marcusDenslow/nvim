@@ -8,21 +8,13 @@ return {
 	-- tools
 	{
 		"mason-org/mason.nvim",
-		opts = function(_, opts)
-			vim.list_extend(opts.ensure_installed, {
+		opts = {
+			ensure_installed = {
 				"stylua",
-				"selene",
-				"luacheck",
-				"shellcheck",
-				"shfmt",
-				"tailwindcss-language-server",
-				"typescript-language-server",
-				"css-lsp",
 				"clangd",
-				"zls",
 				"rust-analyzer",
-			})
-		end,
+			},
+		},
 	},
 
 	-- lsp servers
@@ -49,7 +41,6 @@ return {
 						},
 					},
 				},
-				cssls = {},
 				clangd = {
 					cmd = {
 						"clangd",
@@ -64,49 +55,6 @@ return {
 						usePlaceholders = true,
 						completeUnimported = true,
 						clangdFileStatus = true,
-					},
-				},
-				tailwindcss = {
-					root_dir = function(...)
-						return require("lspconfig.util").root_pattern(".git")(...)
-					end,
-				},
-				tsserver = {
-					root_dir = function(...)
-						return require("lspconfig.util").root_pattern(".git")(...)
-					end,
-					single_file_support = false,
-					settings = {
-						typescript = {
-							inlayHints = {
-								includeInlayParameterNameHints = "literal",
-								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-								includeInlayFunctionParameterTypeHints = true,
-								includeInlayVariableTypeHints = false,
-								includeInlayPropertyDeclarationTypeHints = true,
-								includeInlayFunctionLikeReturnTypeHints = true,
-								includeInlayEnumMemberValueHints = true,
-							},
-						},
-						javascript = {
-							inlayHints = {
-								includeInlayParameterNameHints = "all",
-								includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-								includeInlayFunctionParameterTypeHints = true,
-								includeInlayVariableTypeHints = true,
-								includeInlayPropertyDeclarationTypeHints = true,
-								includeInlayFunctionLikeReturnTypeHints = true,
-								includeInlayEnumMemberValueHints = true,
-							},
-						},
-					},
-				},
-				html = {},
-				yamlls = {
-					settings = {
-						yaml = {
-							keyOrdering = false,
-						},
 					},
 				},
 				zls = {},

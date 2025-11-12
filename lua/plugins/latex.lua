@@ -64,7 +64,7 @@ return {
 			vim.api.nvim_create_autocmd("User", {
 				pattern = "VimtexEventCompileSuccess",
 				callback = function()
-					local tex_notes_dir = vim.fn.expand("$HOME/Documents/tex-notes")
+					local tex_notes_dir = vim.fn.expand("$HOME/tex-notes")
 					local current_file = vim.fn.expand("%:p")
 
 					-- Check if current file is in tex-notes directory
@@ -108,11 +108,46 @@ return {
 		"SirVer/ultisnips",
 		dependencies = { "lervag/vimtex" },
 		config = function()
-			vim.g.UltiSnipsExpandTrigger = "<tab>"
-			vim.g.UltiSnipsJumpForwardTrigger = "<tab>"
-			vim.g.UltiSnipsJumpBackwardTrigger = "<s-tab>"
+			-- Disable UltiSnips' default mappings - we'll set up custom ones
+			vim.g.UltiSnipsExpandTrigger = "<NOP>"
+			vim.g.UltiSnipsJumpForwardTrigger = "<NOP>"
+			vim.g.UltiSnipsJumpBackwardTrigger = "<NOP>"
 			vim.g.UltiSnipsSnippetDirectories = { "UltiSnips" }
 			vim.g.UltiSnipsEnableSnipMate = 0
+
+			-- Set up custom Tab mapping for UltiSnips in tex files
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "tex",
+				callback = function()
+					vim.keymap.set("i", "<Tab>", function()
+						-- Check if UltiSnips can expand or jump
+						if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 or vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+							vim.fn["UltiSnips#ExpandSnippetOrJump"]()
+						else
+							-- Fallback to normal tab (insert 4 spaces or a tab character)
+							vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Tab>", true, false, true), "n", false)
+						end
+					end, { buffer = true, silent = true })
+
+					vim.keymap.set("s", "<Tab>", function()
+						-- In select mode, always try to jump forward
+						if vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+							vim.fn["UltiSnips#JumpForwards"]()
+						else
+							vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Tab>", true, false, true), "n", false)
+						end
+					end, { buffer = true, silent = true })
+
+					vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+						-- Jump backwards if possible
+						if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
+							vim.fn["UltiSnips#JumpBackwards"]()
+						else
+							vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<S-Tab>", true, false, true), "n", false)
+						end
+					end, { buffer = true, silent = true })
+				end,
+			})
 
 			-- Ensure select mode works properly for placeholder replacement
 			vim.cmd([[

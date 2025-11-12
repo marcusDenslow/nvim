@@ -13,30 +13,30 @@ endglobal
 
 
 snippet template "Basic template" b
-\documentclass[a4paper]{article}
+\documentclass{report}
 
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{textcomp}
-\usepackage[dutch]{babel}
-\usepackage{amsmath, amssymb}
+\input{../templates/preamble}
+\input{../templates/macros}
+\input{../templates/letterfonts}
 
-
-% figure support
-\usepackage{import}
-\usepackage{xifthen}
-\pdfminorversion=7
-\usepackage{pdfpages}
-\usepackage{transparent}
-\newcommand{\incfig}[1]{%
-    \def\svgwidth{\columnwidth}
-    \import{./figures/}{#1.pdf_tex}
-}
-
-\pdfsuppresswarningpagegroup=1
+\title{\Huge{${1:Title}}\\ ${2:undertext}}
+\author{\Huge{Marcus Allen Denslow}}
+\date{${3}}
 
 \begin{document}
-    $0
+
+\maketitle
+\newpage% or \cleardoublepage
+% \pdfbookmark[<level>]{<title>}{<dest>}
+\pdfbookmark[section]{\contentsname}{toc}
+\tableofcontents
+\pagebreak
+
+\chapter{${4:Chapter Title}}
+\section{${5:Section Title}}
+
+$0
+
 \end{document}
 endsnippet
 

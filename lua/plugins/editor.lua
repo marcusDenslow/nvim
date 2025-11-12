@@ -271,10 +271,50 @@ return {
 
 			opts.keymap = opts.keymap or {}
 			opts.keymap.preset = "enter"
-			opts.keymap["<C-n>"] = { "select_next", "snippet_forward", "fallback" }
-			opts.keymap["<C-p>"] = { "select_prev", "snippet_backward", "fallback" }
-			opts.keymap["<Tab>"] = { "snippet_forward", "fallback" }
-			opts.keymap["<S-Tab>"] = { "snippet_backward", "fallback" }
+			opts.keymap["<C-n>"] = { "select_next", "fallback" }
+			opts.keymap["<C-p>"] = { "select_prev", "fallback" }
+
+			-- Custom Tab handler for UltiSnips integration
+			opts.keymap["<Tab>"] = {
+				function(cmp)
+					-- First check if UltiSnips can expand or jump
+					if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 or vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+						vim.api.nvim_feedkeys(
+							vim.api.nvim_replace_termcodes("<Plug>(ultisnips_expand_or_jump)", true, true, true),
+							"m",
+							true
+						)
+						return
+					end
+					-- Then check if completion menu is visible
+					if cmp.is_visible() then
+						return cmp.select_next()
+					end
+					-- Otherwise fallback to default Tab behavior
+					return cmp.fallback()
+				end,
+			}
+
+			-- Custom Shift-Tab handler for UltiSnips integration
+			opts.keymap["<S-Tab>"] = {
+				function(cmp)
+					-- First check if UltiSnips can jump backwards
+					if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
+						vim.api.nvim_feedkeys(
+							vim.api.nvim_replace_termcodes("<Plug>(ultisnips_jump_backward)", true, true, true),
+							"m",
+							true
+						)
+						return
+					end
+					-- Then check if completion menu is visible
+					if cmp.is_visible() then
+						return cmp.select_prev()
+					end
+					-- Otherwise fallback to default Shift-Tab behavior
+					return cmp.fallback()
+				end,
+			}
 
 			return opts
 		end,
