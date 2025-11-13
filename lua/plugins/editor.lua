@@ -179,11 +179,9 @@ return {
 				function(cmp)
 					-- First check if UltiSnips can expand or jump
 					if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 or vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
-						vim.api.nvim_feedkeys(
-							vim.api.nvim_replace_termcodes("<Plug>(ultisnips_expand_or_jump)", true, true, true),
-							"m",
-							true
-						)
+						vim.schedule(function()
+							vim.fn["UltiSnips#ExpandSnippetOrJump"]()
+						end)
 						return
 					end
 					-- Then check if completion menu is visible
@@ -200,11 +198,9 @@ return {
 				function(cmp)
 					-- First check if UltiSnips can jump backwards
 					if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
-						vim.api.nvim_feedkeys(
-							vim.api.nvim_replace_termcodes("<Plug>(ultisnips_jump_backward)", true, true, true),
-							"m",
-							true
-						)
+						vim.schedule(function()
+							vim.fn["UltiSnips#JumpBackwards"]()
+						end)
 						return
 					end
 					-- Then check if completion menu is visible

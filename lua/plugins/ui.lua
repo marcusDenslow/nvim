@@ -32,4 +32,17 @@ return {
 			})
 		end,
 	},
+
+	-- Alpha.nvim - Splash screen
+	{
+		"goolord/alpha-nvim",
+		event = "VimEnter",
+		opts = function()
+			local dashboard = require("alpha.themes.dashboard")
+			return dashboard.config
+		end,
+		config = function(_, dashboard)
+			require("alpha").setup(dashboard)
+		end,
+	},
 }

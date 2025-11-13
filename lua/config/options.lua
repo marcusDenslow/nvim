@@ -27,7 +27,7 @@ vim.opt.smarttab = true
 vim.opt.breakindent = true
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
-vim.opt.wrap = false -- No Wrap lines
+vim.opt.wrap = true -- No Wrap lines
 vim.opt.backspace = { "start", "eol", "indent" }
 vim.opt.path:append({ "**" }) -- Finding files - Search down into subfolders
 vim.opt.wildignore:append({ "*/node_modules/*" })
@@ -72,20 +72,4 @@ vim.filetype.add({
 -- Disable virtual_text immediately to prevent conflicts with tiny-inline-diagnostic
 vim.diagnostic.config({
 	virtual_text = false,
-})
-
--- Custom mode display that shows NORMAL
-local function show_mode()
-	local mode = vim.api.nvim_get_mode().mode
-	if mode == "n" then
-		vim.cmd('echohl ModeMsg | echo "--NORMAL--" | echohl None')
-	end
-end
-
-vim.api.nvim_create_autocmd({ "ModeChanged", "CursorMoved" }, {
-	callback = function()
-		if vim.api.nvim_get_mode().mode == "n" then
-			vim.defer_fn(show_mode, 10)
-		end
-	end,
 })

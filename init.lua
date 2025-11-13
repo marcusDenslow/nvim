@@ -18,6 +18,3 @@ vim.opt.swapfile = false
 
 vim.keymap.set("i", "kj", "<Esc>", { noremap = true })
 vim.keymap.set("v", "kj", "<Esc>", { noremap = true })
--- Swap up and down arrow keys
-vim.keymap.set("n", "<Up>", "<Down>", { noremap = true })
-vim.keymap.set("n", "<Down>", "<Up>", { noremap = true })
