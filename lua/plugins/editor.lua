@@ -39,175 +39,75 @@ return {
 	{
 		"nvim-telescope/telescope.nvim",
 		dependencies = {
+			"nvim-lua/plenary.nvim",
 			{
 				"nvim-telescope/telescope-fzf-native.nvim",
 				build = "make",
 			},
-			"nvim-telescope/telescope-file-browser.nvim",
 		},
 		keys = {
-			{
-				"<leader>fP",
-				function()
-					require("telescope.builtin").find_files({
-						cwd = require("lazy.core.config").options.root,
-					})
-				end,
-				desc = "Find Plugin File",
-			},
-			{
-				";f",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.find_files({
-						no_ignore = false,
-						hidden = true,
-					})
-				end,
-				desc = "Lists files in your current working directory, respects .gitignore",
-			},
-			{
-				";r",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.live_grep({
-						additional_args = { "--hidden" },
-					})
-				end,
-				desc = "Search for a string in your current working directory and get results live as you type, respects .gitignore",
-			},
-			{
-				"\\\\",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.buffers()
-				end,
-				desc = "Lists open buffers",
-			},
-			{
-				";t",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.help_tags()
-				end,
-				desc = "Lists available help tags and opens a new window with the relevant help info on <cr>",
-			},
-			{
-				";;",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.resume()
-				end,
-				desc = "Resume the previous telescope picker",
-			},
-			{
-				";e",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.diagnostics()
-				end,
-				desc = "Lists Diagnostics for all open buffers or a specific buffer",
-			},
-			{
-				";s",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.treesitter()
-				end,
-				desc = "Lists Function names, variables, from Treesitter",
-			},
-			{
-				";c",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.lsp_incoming_calls()
-				end,
-				desc = "Lists LSP incoming calls for word under the cursor",
-			},
-			{
-				"sf",
-				function()
-					local telescope = require("telescope")
+			-- File search
+			{ "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
+			{ "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
+			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Find buffers" },
+			{ "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help tags" },
+			{ "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
+			{ "<leader>fw", "<cmd>Telescope grep_string<cr>", desc = "Find word under cursor" },
+			{ "<leader>fc", "<cmd>Telescope commands<cr>", desc = "Commands" },
+			{ "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Keymaps" },
 
-					local function telescope_buffer_dir()
-						return vim.fn.expand("%:p:h")
-					end
+			-- Git
+			{ "<leader>gc", "<cmd>Telescope git_commits<cr>", desc = "Git commits" },
+			{ "<leader>gs", "<cmd>Telescope git_status<cr>", desc = "Git status" },
 
-					telescope.extensions.file_browser.file_browser({
-						path = "%:p:h",
-						cwd = telescope_buffer_dir(),
-						respect_gitignore = false,
-						hidden = true,
-						grouped = true,
-						previewer = false,
-						initial_mode = "normal",
-						layout_config = { height = 40 },
-					})
-				end,
-				desc = "Open File Browser with the path of the current buffer",
+			-- LSP
+			{ "<leader>fd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
+			{ "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document symbols" },
+
+			-- Resume last picker
+			{ "<leader>f.", "<cmd>Telescope resume<cr>", desc = "Resume last picker" },
+		},
+		opts = {
+			defaults = {
+				prompt_prefix = "🔍 ",
+				selection_caret = "➜ ",
+				path_display = { "truncate" },
+				sorting_strategy = "ascending",
+				layout_config = {
+					horizontal = {
+						prompt_position = "top",
+						preview_width = 0.55,
+					},
+					vertical = {
+						mirror = false,
+					},
+					width = 0.87,
+					height = 0.80,
+					preview_cutoff = 120,
+				},
+				mappings = {
+					i = {
+						["<C-j>"] = "move_selection_next",
+						["<C-k>"] = "move_selection_previous",
+					},
+				},
+			},
+			pickers = {
+				find_files = {
+					find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
+					hidden = true,
+				},
+				live_grep = {
+					additional_args = function()
+						return { "--hidden" }
+					end,
+				},
 			},
 		},
 		config = function(_, opts)
 			local telescope = require("telescope")
-			local actions = require("telescope.actions")
-			local fb_actions = require("telescope").extensions.file_browser.actions
-
-			opts.defaults = vim.tbl_deep_extend("force", opts.defaults, {
-				wrap_results = true,
-				layout_strategy = "vertical",
-				layout_config = { prompt_position = "top" },
-				sorting_strategy = "ascending",
-				winblend = 0,
-				mappings = {
-					n = {},
-				},
-			})
-			opts.pickers = {
-				find_files = {
-					find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*", "--glob", "!**/.zig-cache/*", "--glob", "!**/zig-out/*" },
-					follow = false,
-				},
-				diagnostics = {
-					theme = "ivy",
-					initial_mode = "normal",
-					layout_config = {
-						preview_cutoff = 9999,
-					},
-				},
-			}
-			opts.extensions = {
-				file_browser = {
-					theme = "dropdown",
-					-- disables netrw and use telescope-file-browser in its place
-					hijack_netrw = true,
-					mappings = {
-						-- your custom insert mode mappings
-						["n"] = {
-							-- your custom normal mode mappings
-							["N"] = fb_actions.create,
-							["h"] = fb_actions.goto_parent_dir,
-							["/"] = function()
-								vim.cmd("startinsert")
-							end,
-							["<C-u>"] = function(prompt_bufnr)
-								for i = 1, 10 do
-									actions.move_selection_previous(prompt_bufnr)
-								end
-							end,
-							["<C-d>"] = function(prompt_bufnr)
-								for i = 1, 10 do
-									actions.move_selection_next(prompt_bufnr)
-								end
-							end,
-							["<PageUp>"] = actions.preview_scrolling_up,
-							["<PageDown>"] = actions.preview_scrolling_down,
-						},
-					},
-				},
-			}
 			telescope.setup(opts)
-			require("telescope").load_extension("fzf")
-			require("telescope").load_extension("file_browser")
+			telescope.load_extension("fzf")
 		end,
 	},
 
@@ -320,83 +220,7 @@ return {
 		end,
 	},
 
-	{
-		"hrsh7th/nvim-cmp",
-		dependencies = {
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-cmdline",
-			"micangl/cmp-vimtex",
-		},
-		event = "InsertEnter",
-		config = function()
-			local cmp = require("cmp")
-
-			-- Initialize the global toggle state
-			vim.g.cmp_toggle_disabled = false
-
-			cmp.setup({
-				enabled = function()
-					-- Check if manually disabled
-					if vim.g.cmp_toggle_disabled then
-						return false
-					end
-					-- Disable in select mode (UltiSnips placeholders)
-					local mode = vim.api.nvim_get_mode().mode
-					if mode == "s" or mode == "S" or mode == "\19" then
-						return false
-					end
-					return true
-				end,
-				completion = {
-					autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
-				},
-				mapping = cmp.mapping.preset.insert({
-					["<Tab>"] = cmp.mapping(function(fallback)
-						-- Check if we're in a snippet and can jump forward
-						if vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
-							return vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(ultisnips_jump_forward)", true, true, true), 'm', true)
-						end
-
-						if cmp.visible() then
-							cmp.select_next_item()
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-					["<S-Tab>"] = cmp.mapping(function(fallback)
-						-- Check if we're in a snippet and can jump backward
-						if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
-							return vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Plug>(ultisnips_jump_backward)", true, true, true), 'm', true)
-						end
-
-						if cmp.visible() then
-							cmp.select_prev_item()
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-					["<C-d>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<C-Space>"] = cmp.mapping.complete(),
-					["<C-y>"] = cmp.mapping.complete(), -- Alternative trigger
-					["<C-e>"] = cmp.mapping.close(),
-					["<CR>"] = cmp.mapping.confirm({
-						behavior = cmp.ConfirmBehavior.Replace,
-						select = true,
-					}),
-					["<C-n>"] = cmp.mapping.select_next_item(),
-					["<C-p>"] = cmp.mapping.select_prev_item(),
-				}),
-				sources = cmp.config.sources({
-					{ name = "vimtex", priority = 1000 },
-					{ name = "nvim_lsp", priority = 800 },
-					{ name = "buffer", priority = 500, keyword_length = 3 },
-				}),
-			})
-		end,
-	},
+	
 
 
 	{

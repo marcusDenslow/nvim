@@ -7,7 +7,11 @@ _G.dd = function(...)
 end
 vim.print = _G.dd
 
+-- Load configuration
+require("config.options")
 require("config.lazy")
+require("config.keymaps")
+require("config.autocmds")
 
 vim.opt.guicursor = "n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250"
 vim.opt.swapfile = false

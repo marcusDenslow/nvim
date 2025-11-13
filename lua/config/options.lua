@@ -5,6 +5,7 @@ vim.opt.fileencoding = "utf-8"
 
 vim.opt.termguicolors = true
 vim.opt.number = true
+vim.opt.relativenumber = true
 vim.opt.colorcolumn = "80"
 
 vim.opt.title = true
@@ -67,10 +68,6 @@ vim.filetype.add({
 		mdx = "mdx",
 	},
 })
-
-vim.g.lazyvim_prettier_needs_config = true
-vim.g.lazyvim_picker = "telescope"
-vim.g.lazyvim_cmp = "blink.cmp"
 
 -- Disable virtual_text immediately to prevent conflicts with tiny-inline-diagnostic
 vim.diagnostic.config({
