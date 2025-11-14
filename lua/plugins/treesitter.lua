@@ -27,11 +27,13 @@ return {
 			},
 			highlight = {
 				enable = true,
+				disable = { "latex", "tex" },
 			},
 			indent = {
 				enable = true,
 			},
 			auto_install = true,
+		ignore_install = { "latex", "tex" },
 		},
 	},
 }
