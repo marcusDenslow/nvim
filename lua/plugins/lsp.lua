@@ -10,9 +10,16 @@ return {
 		"mason-org/mason.nvim",
 		opts = {
 			ensure_installed = {
-				"stylua",
+				-- LSP servers
 				"clangd",
-				"rust-analyzer",
+				-- rust-analyzer handled by rustaceanvim
+				"pyright",
+				-- Formatters
+				"stylua",
+				"black",
+				"isort",
+				"prettier",
+				"clang-format",
 			},
 		},
 	},
@@ -32,7 +39,10 @@ return {
 					-- Key mappings
 					local opts = { buffer = ev.buf, silent = true }
 					vim.keymap.set("n", "gd", function()
-						require("telescope.builtin").lsp_definitions({ reuse_win = false })
+						require("goto-preview").goto_preview_definition()
+					end, opts)
+					vim.keymap.set("n", "gp", function()
+						require("goto-preview").close_all_win()
 					end, opts)
 					vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
 					vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
@@ -78,19 +88,7 @@ return {
 				root_markers = { "zls.json", "build.zig", ".git" },
 			}
 
-			-- Configure rust-analyzer
-			vim.lsp.config.rust_analyzer = {
-				cmd = { "rust-analyzer" },
-				filetypes = { "rust" },
-				root_markers = { "Cargo.toml", "rust-project.json" },
-				settings = {
-					["rust-analyzer"] = {
-						cargo = {
-							allFeatures = true,
-						},
-					},
-				},
-			}
+			-- rust-analyzer is handled by rustaceanvim plugin
 
 			-- Configure lua_ls
 			vim.lsp.config.lua_ls = {
@@ -136,6 +134,30 @@ return {
 				},
 			}
 
+			-- Configure pyright (Python)
+			vim.lsp.config.pyright = {
+				cmd = { "pyright-langserver", "--stdio" },
+				filetypes = { "python" },
+				root_markers = {
+					"pyproject.toml",
+					"setup.py",
+					"setup.cfg",
+					"requirements.txt",
+					"Pipfile",
+					".git",
+				},
+				single_file_support = true,
+				settings = {
+					python = {
+						analysis = {
+							autoSearchPaths = true,
+							useLibraryCodeForTypes = true,
+							diagnosticMode = "workspace",
+						},
+					},
+				},
+			}
+
 			-- Enable LSP servers for the appropriate filetypes
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
@@ -151,17 +173,19 @@ return {
 				end,
 			})
 
-			vim.api.nvim_create_autocmd("FileType", {
-				pattern = "rust",
-				callback = function()
-					vim.lsp.enable("rust_analyzer")
-				end,
-			})
+			-- Rust FileType handled by rustaceanvim
 
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = "lua",
 				callback = function()
 					vim.lsp.enable("lua_ls")
+				end,
+			})
+
+			vim.api.nvim_create_autocmd("FileType", {
+				pattern = "python",
+				callback = function()
+					vim.lsp.enable("pyright")
 				end,
 			})
 		end,
@@ -173,8 +197,9 @@ return {
 			ensure_installed = {
 				"lua_ls",
 				"clangd",
-				"rust_analyzer",
+				-- rust_analyzer handled by rustaceanvim
 				"zls",
+				"pyright",
 			},
 		},
 	},

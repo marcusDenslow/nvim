@@ -1,22 +1,67 @@
 return {
+	-- Colorschemes
+	{ "folke/tokyonight.nvim", lazy = false, priority = 1000 },
+	{ "catppuccin/nvim", name = "catppuccin", lazy = false, priority = 1000 },
+	{ "rebelot/kanagawa.nvim", lazy = false, priority = 1000 },
+	{ "rose-pine/neovim", name = "rose-pine", lazy = false, priority = 1000 },
+	{ "EdenEast/nightfox.nvim", lazy = false, priority = 1000 },
+	{ "sainnhe/gruvbox-material", lazy = false, priority = 1000 },
 	{
-		"sainnhe/gruvbox-material",
+		"slugbyte/lackluster.nvim",
 		lazy = false,
 		priority = 1000,
+		opts = {
+			tweak_background = {
+				normal = "#101010",
+				telescope = "#101010",
+				menu = "#101010",
+				popup = "#101010",
+			},
+			tweak_highlight = {
+				["Normal"] = {
+					fg = "#ffffff",
+				},
+			},
+		},
+	},
+
+	-- Colorscheme switcher with live preview
+	{
+		"zaldih/themery.nvim",
+		lazy = false,
 		config = function()
-			-- Optionally configure and load the colorscheme
-			-- directly inside the plugin declaration.
-			vim.g.gruvbox_material_background = "hard"
-			vim.g.gruvbox_material_enable_italic = true
-			vim.cmd.colorscheme("gruvbox-material")
+			require("themery").setup({
+				themes = {
+					"tokyonight-night",
+					"tokyonight-storm",
+					"tokyonight-moon",
+					"tokyonight-day",
+					"catppuccin-mocha",
+					"catppuccin-macchiato",
+					"catppuccin-frappe",
+					"catppuccin-latte",
+					"kanagawa",
+					"kanagawa-dragon",
+					"kanagawa-wave",
+					"rose-pine",
+					"rose-pine-moon",
+					"rose-pine-dawn",
+					"nightfox",
+					"dawnfox",
+					"duskfox",
+					"nordfox",
+					"terafox",
+					"carbonfox",
+					"gruvbox-material",
+					"lackluster",
+					"lackluster-hack",
+					"lackluster-mint",
+				},
+				livePreview = true, -- Live preview of colorscheme changes
+			})
 
-			-- Override background to match Ghostty (#101010)
-			vim.api.nvim_set_hl(0, "Normal", { bg = "#101010" })
-			vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#101010" })
-			vim.api.nvim_set_hl(0, "NormalNC", { bg = "#101010" })
-
-			-- Set colorcolumn to light gray
-			vim.api.nvim_set_hl(0, "ColorColumn", { bg = "#3a3a3a" })
+			-- Keybinding to open themery
+			vim.keymap.set("n", "<leader>ft", "<cmd>Themery<cr>", { desc = "Change colorscheme (theme)" })
 		end,
 	},
 }

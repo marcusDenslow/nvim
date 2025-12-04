@@ -1,6 +1,15 @@
 global !p
 def math():
-    return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+    # Check if in math zone OR in any matrix environment
+    in_math = vim.eval('vimtex#syntax#in_mathzone()') == '1'
+    if in_math:
+        return True
+    # Also check for matrix environments
+    matrix_envs = ['pmatrix', 'bmatrix', 'Bmatrix', 'vmatrix', 'Vmatrix', 'matrix', 'array']
+    for env_name in matrix_envs:
+        if env(env_name):
+            return True
+    return False
 
 def comment():
     return vim.eval('vimtex#syntax#in_comment()') == '1'
@@ -204,9 +213,6 @@ snip.rv = subprocess.check_output(['wolframscript', '-code', code])
 `
 endsnippet
 
-snippet == "equals" iA
-&= $1 \\\\
-endsnippet
 
 snippet != "equals" iA
 \neq
@@ -584,6 +590,12 @@ priority 100
 context "math()"
 snippet "([a-z])bar" "bar" riA
 \overline{`!p snip.rv=match.group(1)`}
+endsnippet
+
+priority 300
+context "math()"
+snippet hbar "hbar" iA
+\hbar
 endsnippet
 
 priority 10
@@ -973,6 +985,11 @@ snippet rm "mathrm" iA
 \mathrm{$1}$0
 endsnippet
 
+context "math()"
+snippet mbb "mathbb" iA
+\mathbb{$1}$0
+endsnippet
+
 # Linear algebra
 context "math()"
 snippet '([^\\])(det)' "det" rwA
@@ -1006,7 +1023,19 @@ snippet '([a-z])und' "underline" rwA
 endsnippet
 
 context "math()"
-snippet '([a-z])vec' "vec" rwA
+snippet '([A-Za-z])vec' "vec" rwA
+\vec{`!p snip.rv=match.group(1)`}
+endsnippet
+
+priority 200
+context "math()"
+snippet '\\(alpha|beta|gamma|delta|epsilon|varepsilon|zeta|eta|theta|vartheta|iota|kappa|lambda|mu|nu|xi|pi|rho|varrho|sigma|tau|upsilon|phi|varphi|chi|psi|omega)vec' "greek letter vec" rwA
+\vec{`!p snip.rv=match.group(1)`}
+endsnippet
+
+priority 200
+context "math()"
+snippet '\\(Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|Lambda|Mu|Nu|Xi|Pi|Rho|Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega)vec' "Greek letter vec" rwA
 \vec{`!p snip.rv=match.group(1)`}
 endsnippet
 
@@ -1053,6 +1082,11 @@ endsnippet
 context "math()"
 snippet prop "propto" iA
 \propto
+endsnippet
+
+context "math()"
+snippet app "approx" iA
+\approx
 endsnippet
 
 # Set operations
@@ -1260,6 +1294,23 @@ endsnippet
 context "math()"
 snippet tayl "taylor expansion" iA
 ${0:f}(${1:x} + ${2:h}) = ${0:f}(${1:x}) + ${0:f}'(${1:x})${2:h} + ${0:f}''(${1:x}) \frac{${2:h}^{2}}{2!} + \dots$3
+endsnippet
+
+# Custom commands from ~/tex-notes/templates
+snippet dfn "definition box" bA
+\dfn{${1:title}}{${2:content}}$0
+endsnippet
+
+snippet qs "question box" bA
+\qs{${1:title}}{${2:content}}$0
+endsnippet
+
+snippet sol "solution text" bA
+\sol $0
+endsnippet
+
+snippet solve "solution with content" bA
+\solve{${1:content}}$0
 endsnippet
 
 # vim:ft=snippets
