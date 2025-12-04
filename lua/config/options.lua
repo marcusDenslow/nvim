@@ -3,16 +3,22 @@ vim.g.mapleader = " "
 vim.opt.encoding = "utf-8"
 vim.opt.fileencoding = "utf-8"
 
+vim.opt.clipboard = "unnamedplus"
+
 vim.opt.termguicolors = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.colorcolumn = "80"
+vim.opt.signcolumn = "yes"  -- Always show sign column for breakpoints
+-- vim.opt.colorcolumn = "80"
 
+-- vim.opt.numberspace = 3
+vim.opt.numberwidth = 6
 vim.opt.title = true
 vim.opt.autoindent = true
 vim.opt.smartindent = true
 vim.opt.hlsearch = true
 vim.opt.backup = false
+vim.opt.undofile = true
 vim.opt.showcmd = true
 vim.opt.cmdheight = 1
 vim.opt.laststatus = 2
@@ -27,7 +33,7 @@ vim.opt.smarttab = true
 vim.opt.breakindent = true
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
-vim.opt.wrap = true -- No Wrap lines
+vim.opt.wrap = true
 vim.opt.backspace = { "start", "eol", "indent" }
 vim.opt.path:append({ "**" }) -- Finding files - Search down into subfolders
 vim.opt.wildignore:append({ "*/node_modules/*" })
@@ -38,8 +44,8 @@ vim.opt.mouse = ""
 vim.opt.list = false
 vim.opt.fillchars:append({ eob = "~" }) -- Show ~ on empty lines like default vim
 
--- Spell checking
-vim.opt.spell = true
+-- Spell checking (disabled by default, toggle with <leader>ts)
+vim.opt.spell = false
 vim.opt.spelllang = "en_us" -- English (US)
 
 vim.opt.syntax = "on"
@@ -73,3 +79,6 @@ vim.filetype.add({
 vim.diagnostic.config({
 	virtual_text = false,
 })
+
+-- Suppress deprecation warnings from plugins
+vim.deprecate = function() end

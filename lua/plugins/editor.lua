@@ -37,78 +37,64 @@ return {
 	},
 
 	{
-		"nvim-telescope/telescope.nvim",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			{
-				"nvim-telescope/telescope-fzf-native.nvim",
-				build = "make",
-			},
-		},
+		"ibhagwan/fzf-lua",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
 		keys = {
 			-- File search
-			{ "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find files" },
-			{ "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live grep" },
-			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Find buffers" },
-			{ "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help tags" },
-			{ "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent files" },
-			{ "<leader>fw", "<cmd>Telescope grep_string<cr>", desc = "Find word under cursor" },
-			{ "<leader>fc", "<cmd>Telescope commands<cr>", desc = "Commands" },
-			{ "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Keymaps" },
+			{ "<leader><leader>", "<cmd>FzfLua files<cr>", desc = "Find files" },
+			{ "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Find files" },
+			{ "<leader>fg", "<cmd>FzfLua live_grep<cr>", desc = "Live grep" },
+			{ "<leader>fb", "<cmd>FzfLua buffers<cr>", desc = "Find buffers" },
+			{ "<leader>fh", "<cmd>FzfLua help_tags<cr>", desc = "Help tags" },
+			{ "<leader>fr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent files" },
+			{ "<leader>fw", "<cmd>FzfLua grep_cword<cr>", desc = "Find word under cursor" },
+			{ "<leader>fc", "<cmd>FzfLua commands<cr>", desc = "Commands" },
+			{ "<leader>fk", "<cmd>FzfLua keymaps<cr>", desc = "Keymaps" },
 
 			-- Git
-			{ "<leader>gc", "<cmd>Telescope git_commits<cr>", desc = "Git commits" },
-			{ "<leader>gs", "<cmd>Telescope git_status<cr>", desc = "Git status" },
+			{ "<leader>gc", "<cmd>FzfLua git_commits<cr>", desc = "Git commits" },
+			{ "<leader>gs", "<cmd>FzfLua git_status<cr>", desc = "Git status" },
 
 			-- LSP
-			{ "<leader>fd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
-			{ "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>", desc = "Document symbols" },
+			{ "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", desc = "Diagnostics" },
+			{ "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", desc = "Document symbols" },
 
 			-- Resume last picker
-			{ "<leader>f.", "<cmd>Telescope resume<cr>", desc = "Resume last picker" },
+			{ "<leader>f.", "<cmd>FzfLua resume<cr>", desc = "Resume last picker" },
 		},
 		opts = {
-			defaults = {
-				prompt_prefix = "🔍 ",
-				selection_caret = "➜ ",
-				path_display = { "truncate" },
-				sorting_strategy = "ascending",
-				layout_config = {
-					horizontal = {
-						prompt_position = "top",
-						preview_width = 0.55,
-					},
-					vertical = {
-						mirror = false,
-					},
-					width = 0.87,
-					height = 0.80,
-					preview_cutoff = 120,
-				},
-				mappings = {
-					i = {
-						["<C-j>"] = "move_selection_next",
-						["<C-k>"] = "move_selection_previous",
-					},
+			winopts = {
+				border = "none",
+				backdrop = 100,
+				preview = {
+					border = "noborder",
+					title = false,
+					scrollbar = false,
+					hidden = "nohidden",
 				},
 			},
-			pickers = {
-				find_files = {
-					find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
-					hidden = true,
-				},
-				live_grep = {
-					additional_args = function()
-						return { "--hidden" }
-					end,
-				},
+			fzf_colors = true,
+			files = {
+				-- Include hidden files
+				fd_opts = "--color=never --type f --hidden --follow --exclude .git",
+				file_icons = false,
+				git_icons = false,
+			},
+			grep = {
+				-- Include hidden files in grep
+				rg_opts = "--column --line-number --no-heading --color=always --smart-case --hidden --glob '!.git/*'",
+				file_icons = false,
+				git_icons = false,
+			},
+			lsp = {
+				file_icons = false,
+				git_icons = false,
+			},
+			git = {
+				file_icons = false,
+				git_icons = false,
 			},
 		},
-		config = function(_, opts)
-			local telescope = require("telescope")
-			telescope.setup(opts)
-			telescope.load_extension("fzf")
-		end,
 	},
 
 	{
@@ -163,6 +149,12 @@ return {
 			opts.completion = opts.completion or {}
 			opts.completion.menu = opts.completion.menu or {}
 			opts.completion.menu.winblend = vim.o.pumblend
+			opts.completion.menu.max_height = 20
+			opts.completion.menu.draw = opts.completion.menu.draw or {}
+			opts.completion.menu.draw.columns = {
+				{ "kind_icon" },
+				{ "label", "label_description", gap = 1 },
+			}
 
 			opts.signature = opts.signature or {}
 			opts.signature.enabled = true
@@ -178,7 +170,10 @@ return {
 			opts.keymap["<Tab>"] = {
 				function(cmp)
 					-- First check if UltiSnips can expand or jump
-					if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 or vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+					if
+						vim.fn.exists("*UltiSnips#CanExpandSnippet") == 1
+						and (vim.fn["UltiSnips#CanExpandSnippet"]() == 1 or vim.fn["UltiSnips#CanJumpForwards"]() == 1)
+					then
 						vim.schedule(function()
 							vim.fn["UltiSnips#ExpandSnippetOrJump"]()
 						end)
@@ -197,7 +192,10 @@ return {
 			opts.keymap["<S-Tab>"] = {
 				function(cmp)
 					-- First check if UltiSnips can jump backwards
-					if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
+					if
+						vim.fn.exists("*UltiSnips#CanJumpBackwards") == 1
+						and vim.fn["UltiSnips#CanJumpBackwards"]() == 1
+					then
 						vim.schedule(function()
 							vim.fn["UltiSnips#JumpBackwards"]()
 						end)
@@ -216,17 +214,21 @@ return {
 		end,
 	},
 
-	
-
-
 	{
 		"folke/flash.nvim",
 		event = "VeryLazy",
 		---@type Flash.Config
-		opts = {},
+		opts = {
+			modes = {
+				char = {
+					enabled = true,
+					keys = { "f", "F", "t", "T" },
+				},
+			},
+		},
   -- stylua: ignore
   keys = {
-    { "<c-s>", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+    { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
     { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
     { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
     { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -261,8 +263,16 @@ return {
 			keymaps = {
 				["g?"] = "actions.show_help",
 				["<CR>"] = "actions.select",
-				["<C-s>"] = { "actions.select", opts = { vertical = true }, desc = "Open the entry in a vertical split" },
-				["<C-h>"] = { "actions.select", opts = { horizontal = true }, desc = "Open the entry in a horizontal split" },
+				["<C-s>"] = {
+					"actions.select",
+					opts = { vertical = true },
+					desc = "Open the entry in a vertical split",
+				},
+				["<C-h>"] = {
+					"actions.select",
+					opts = { horizontal = true },
+					desc = "Open the entry in a horizontal split",
+				},
 				["<C-t>"] = { "actions.select", opts = { tab = true }, desc = "Open the entry in new tab" },
 				["<C-p>"] = "actions.preview",
 				["<C-c>"] = "actions.close",
@@ -315,5 +325,134 @@ return {
 				desc = "Open Oil in floating window",
 			},
 		},
+	},
+
+	{
+		"mrcjkb/rustaceanvim",
+		version = "^6",
+		lazy = false,
+		ft = { "rust" },
+		init = function()
+			-- Configure codelldb path before rustaceanvim loads
+			local codelldb_path = vim.fn.expand("~/.local/share/nvim/mason/packages/codelldb/extension/adapter/codelldb")
+			local liblldb_path = vim.fn.expand("~/.local/share/nvim/mason/packages/codelldb/extension/lldb/lib/liblldb.so")
+
+			vim.g.rustaceanvim = {
+				dap = {
+					adapter = {
+						type = "server",
+						port = "${port}",
+						executable = {
+							command = codelldb_path,
+							args = { "--port", "${port}" },
+						},
+					},
+				},
+			}
+		end,
+		opts = {
+			server = {
+				on_attach = function(client, bufnr)
+					-- Custom keymaps for Rust
+					vim.keymap.set("n", "<leader>ca", function()
+						vim.cmd.RustLsp("codeAction")
+					end, { buffer = bufnr, desc = "Code Action" })
+					vim.keymap.set("n", "<leader>md", function()
+						vim.cmd.RustLsp("debuggables")
+					end, { buffer = bufnr, desc = "Rust Debuggables" })
+					vim.keymap.set("n", "<leader>mt", function()
+						vim.cmd.RustLsp("testables")
+					end, { buffer = bufnr, desc = "Rust Testables" })
+					vim.keymap.set("n", "<leader>mT", function()
+						vim.cmd.RustLsp({ "testables", bang = true })
+					end, { buffer = bufnr, desc = "Rerun Last Test" })
+				end,
+				default_settings = {
+					["rust-analyzer"] = {
+						cargo = {
+							allFeatures = true,
+							loadOutDirsFromCheck = true,
+							buildScripts = {
+								enable = true,
+							},
+							sysroot = "discover",
+							-- Don't try to build stdlib, just use it for navigation
+							sysrootSrc = "/usr/lib/rustlib/src/rust/library",
+						},
+						rustfmt = {
+							extraArgs = { "+stable" },
+						},
+						check = {
+							allFeatures = true,
+							command = "clippy",
+							extraArgs = { "--no-deps" },
+							allTargets = false,
+						},
+						procMacro = {
+							enable = true,
+							ignored = {
+								["async-trait"] = { "async_trait" },
+								["napi-derive"] = { "napi" },
+								["async-recursion"] = { "async_recursion" },
+							},
+						},
+						-- This is the key setting for auto-importing crates
+						completion = {
+							autoimport = {
+								enable = true,
+							},
+							autoself = {
+								enable = true,
+							},
+							postfix = {
+								enable = true,
+							},
+						},
+						-- Import settings
+						imports = {
+							granularity = {
+								group = "module",
+							},
+							prefix = "self",
+						},
+						inlayHints = {
+							bindingModeHints = {
+								enable = false,
+							},
+							chainingHints = {
+								enable = true,
+							},
+							closingBraceHints = {
+								enable = true,
+								minLines = 25,
+							},
+							closureReturnTypeHints = {
+								enable = "never",
+							},
+							lifetimeElisionHints = {
+								enable = "never",
+								useParameterNames = false,
+							},
+							maxLength = 25,
+							parameterHints = {
+								enable = true,
+							},
+							reborrowHints = {
+								enable = "never",
+							},
+							renderColons = true,
+							typeHints = {
+								enable = true,
+								hideClosureInitialization = false,
+								hideNamedConstructor = false,
+							},
+						},
+					},
+				},
+			},
+		},
+		config = function(_, opts)
+			vim.g.rustaceanvim = vim.tbl_deep_extend("keep", vim.g.rustaceanvim or {}, opts or {})
+		end,
 	},
 }

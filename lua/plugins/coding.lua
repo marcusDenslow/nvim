@@ -18,6 +18,14 @@ return {
 		end,
 	},
 
+	-- Auto-pairs - automatically close brackets, quotes, etc.
+	{
+		"echasnovski/mini.pairs",
+		event = "VeryLazy",
+		config = function()
+			require("mini.pairs").setup()
+		end,
+	},
 
 	-- Tabout plugin - tab out of brackets, quotes, etc.
 	{
