@@ -8,7 +8,7 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.termguicolors = true
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.signcolumn = "yes"  -- Always show sign column for breakpoints
+vim.opt.signcolumn = "yes" -- Always show sign column for breakpoints
 -- vim.opt.colorcolumn = "80"
 
 -- vim.opt.numberspace = 3
@@ -33,7 +33,7 @@ vim.opt.smarttab = true
 vim.opt.breakindent = true
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
-vim.opt.wrap = true
+vim.opt.wrap = false
 vim.opt.backspace = { "start", "eol", "indent" }
 vim.opt.path:append({ "**" }) -- Finding files - Search down into subfolders
 vim.opt.wildignore:append({ "*/node_modules/*" })
