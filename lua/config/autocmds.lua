@@ -28,3 +28,22 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile", "BufEnter" }, {
 		end, 100)
 	end,
 })
+
+-- Light purple matching bracket/parentheses highlighting
+vim.api.nvim_create_autocmd("ColorScheme", {
+	pattern = "*",
+	callback = function()
+		vim.api.nvim_set_hl(0, "MatchParen", {
+			fg = "#000000", -- Black text
+			bg = "#B4A7D6", -- Light purple background block
+			bold = true,
+		})
+	end,
+})
+
+-- Apply the highlight immediately on startup
+vim.api.nvim_set_hl(0, "MatchParen", {
+	fg = "#000000", -- Black text
+	bg = "#B4A7D6", -- Light purple background block
+	bold = true,
+})

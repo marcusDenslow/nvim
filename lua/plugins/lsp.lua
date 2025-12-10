@@ -13,7 +13,7 @@ return {
 				-- LSP servers
 				"clangd",
 				-- rust-analyzer handled by rustaceanvim
-				"pyright",
+				"python-lsp-server",  -- Better hover docs than pyright
 				-- Formatters
 				"stylua",
 				"black",
@@ -49,6 +49,15 @@ return {
 					vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
 					vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+
+					-- Python-specific: Open docs.python.org for symbol under cursor
+					if vim.bo[ev.buf].filetype == "python" then
+						vim.keymap.set("n", "gK", function()
+							local word = vim.fn.expand("<cword>")
+							local url = string.format("https://docs.python.org/3/search.html?q=%s", word)
+							vim.fn.jobstart({ "xdg-open", url }, { detach = true })
+						end, { buffer = ev.buf, silent = true, desc = "Open Python docs for symbol" })
+					end
 				end,
 			})
 
@@ -134,9 +143,9 @@ return {
 				},
 			}
 
-			-- Configure pyright (Python)
-			vim.lsp.config.pyright = {
-				cmd = { "pyright-langserver", "--stdio" },
+			-- Configure pylsp (Python) - shows full docstrings in hover
+			vim.lsp.config.pylsp = {
+				cmd = { "pylsp" },
 				filetypes = { "python" },
 				root_markers = {
 					"pyproject.toml",
@@ -148,11 +157,21 @@ return {
 				},
 				single_file_support = true,
 				settings = {
-					python = {
-						analysis = {
-							autoSearchPaths = true,
-							useLibraryCodeForTypes = true,
-							diagnosticMode = "workspace",
+					pylsp = {
+						plugins = {
+							pycodestyle = { enabled = false },
+							mccabe = { enabled = false },
+							pyflakes = { enabled = false },
+							pylint = { enabled = false },
+							autopep8 = { enabled = false },
+							yapf = { enabled = false },
+							-- Enable rope for better hover docs
+							rope_completion = { enabled = true },
+							jedi_completion = { enabled = true },
+							jedi_hover = { enabled = true },
+							jedi_references = { enabled = true },
+							jedi_signature_help = { enabled = true },
+							jedi_symbols = { enabled = true },
 						},
 					},
 				},
@@ -185,7 +204,7 @@ return {
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = "python",
 				callback = function()
-					vim.lsp.enable("pyright")
+					vim.lsp.enable("pylsp")
 				end,
 			})
 		end,
@@ -199,7 +218,7 @@ return {
 				"clangd",
 				-- rust_analyzer handled by rustaceanvim
 				"zls",
-				"pyright",
+				"pylsp",
 			},
 		},
 	},

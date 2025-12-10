@@ -24,6 +24,17 @@ return {
 			},
 		},
 	},
+	{ "bluz71/vim-moonfly-colors", name = "moonfly", lazy = false, priority = 1000 },
+	{
+		"miikanissi/modus-themes.nvim",
+		lazy = false,
+		priority = 1000,
+		config = function()
+			require("modus-themes").setup({
+				-- Optional configuration here
+			})
+		end,
+	},
 
 	-- Colorscheme switcher with live preview
 	{
@@ -56,6 +67,9 @@ return {
 					"lackluster",
 					"lackluster-hack",
 					"lackluster-mint",
+					"moonfly",
+					"modus_operandi",
+					"modus_vivendi",
 				},
 				livePreview = true, -- Live preview of colorscheme changes
 			})

@@ -442,7 +442,7 @@ endsnippet
 
 priority 100
 context "math()"
-snippet '(?<!\\)(sin|cos|arccot|cot|csc|ln|log|exp|star|perp)' "ln" rwA
+snippet '(?<!\\)(sin|cos|tan|arccot|cot|csc|ln|log|exp|star|perp)' "ln" rwA
 \\`!p snip.rv = match.group(1)`
 endsnippet
 
@@ -1311,6 +1311,12 @@ endsnippet
 
 snippet solve "solution with content" bA
 \solve{${1:content}}$0
+endsnippet
+
+# Cancel snippets
+context "math()"
+snippet canc "cancel" iA
+\cancel{${1:${VISUAL}}}$0
 endsnippet
 
 # vim:ft=snippets
