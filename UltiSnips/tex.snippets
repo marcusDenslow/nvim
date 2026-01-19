@@ -146,6 +146,11 @@ snippet // "Fraction" iA
 \\frac{$1}{$2}$0
 endsnippet
 
+context "math()"
+snippet bot "bot" iA
+\bot
+endsnippet
+
 snippet / "Fraction" i
 \\frac{${VISUAL}}{$1}$0
 endsnippet
@@ -276,6 +281,10 @@ endsnippet
 
 snippet sum "sum" w
 \sum_{n=${1:1}}^{${2:\infty}} ${3:a_n z^n}
+endsnippet
+
+snippet bsum "sum without upper bound" iA
+\sum_{${1}} ${2}
 endsnippet
 
 snippet taylor "taylor" w
@@ -677,18 +686,28 @@ snippet Delta "Delta" wA
 endsnippet
 
 context "math()"
-snippet epsilon "epsilon" wA
+snippet eps "epsilon" wA
 \epsilon
 endsnippet
 
 context "math()"
-snippet varepsilon "varepsilon" wA
+snippet vareps "varepsilon" wA
 \varepsilon
 endsnippet
 
 context "math()"
 snippet zeta "zeta" wA
 \zeta
+endsnippet
+
+context "math()"
+snippet Im "Im" iA
+\Im ${1}
+endsnippet
+
+context "math()"
+snippet Re "Re" iA
+\Re ${1}
 endsnippet
 
 context "math()"
@@ -1057,7 +1076,7 @@ endsnippet
 
 context "math()"
 snippet del "nabla/del" iA
-\nabla
+\delta
 endsnippet
 
 context "math()"
@@ -1252,6 +1271,7 @@ snippet Vmat "Vmatrix" iA
 \begin{Vmatrix} $0 \end{Vmatrix}
 endsnippet
 
+context "math()"
 snippet matrix "matrix" iA
 \begin{matrix} $0 \end{matrix}
 endsnippet

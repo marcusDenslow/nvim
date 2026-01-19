@@ -162,3 +162,13 @@ keymap.set("n", "<leader>tc", function()
 		print("Blink.cmp disabled")
 	end
 end, { desc = "Toggle blink.cmp completion", noremap = true, silent = true })
+
+-- Toggle line wrap
+keymap.set("n", "<leader>tw", function()
+	vim.opt.wrap = not vim.opt.wrap:get()
+	if vim.opt.wrap:get() then
+		print("Line wrap enabled")
+	else
+		print("Line wrap disabled")
+	end
+end, { desc = "Toggle line wrap", noremap = true, silent = true })
