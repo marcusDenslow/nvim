@@ -134,11 +134,22 @@ ${1:${VISUAL}}
 .\] $0
 endsnippet
 
+snippet sec "section" bA 
+\section{$1} $0
+endsnippet
+
 snippet ali "Align" bA
 \begin{align*}
     ${1:${VISUAL}}
 .\end{align*}
 endsnippet
+
+snippet equ "equation" bA 
+\begin{equation}
+    ${1:${VISUAL}}
+\end{equation}
+endsnippet
+    
 
 
 context "math()"
@@ -629,11 +640,7 @@ snippet today "today" iA
 `!p import datetime; snip.rv = datetime.datetime.now().strftime("%Y-%m-%d")`
 endsnippet
 
-snippet sign "signature" iA
-Yours sincerely,
 
-Marcus Denslow
-endsnippet
 
 # ===== ADDITIONAL SNIPPETS FROM OBSIDIAN =====
 
@@ -773,6 +780,11 @@ endsnippet
 context "math()"
 snippet pi "pi" wA
 \pi
+endsnippet
+
+context "math()"
+snippet prod "prod" wA 
+\prod
 endsnippet
 
 context "math()"
@@ -1207,9 +1219,14 @@ snippet o+ "oplus" iA
 \oplus
 endsnippet
 
+#context "math()"
+#snippet ox "otimes" iA
+#\otimes
+#endsnippet
+
 context "math()"
-snippet ox "otimes" iA
-\otimes
+snippet box "boxed" iA 
+\boxed{$1} $0
 endsnippet
 
 context "math()"

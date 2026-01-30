@@ -155,4 +155,91 @@ function M.get_upvalue(func, name)
 	end
 end
 
+-- CUDA debugging utilities
+function M.cuda_compile()
+	local current_file = vim.fn.expand("%:p")
+	local file_ext = vim.fn.expand("%:e")
+
+	-- Check if current file is a CUDA file
+	if file_ext ~= "cu" then
+		vim.schedule(function()
+			vim.notify("Not a .cu file! Current file: " .. vim.fn.expand("%:t"), vim.log.levels.ERROR, { title = "CUDA Compile" })
+		end)
+		return nil
+	end
+
+	-- Determine output executable name (remove .cu extension)
+	local output_name = vim.fn.expand("%:t:r")
+	local output_path = vim.fn.getcwd() .. "/" .. output_name
+
+	-- Compile command with debug flags
+	local compile_cmd = string.format("nvcc -g -G -o %s %s 2>&1", output_name, current_file)
+
+	-- Show brief compile message in command line (non-blocking)
+	vim.api.nvim_echo({ { "Compiling " .. vim.fn.expand("%:t") .. "...", "None" } }, false, {})
+
+	-- Run compilation
+	local result = vim.fn.system(compile_cmd)
+	local exit_code = vim.v.shell_error
+
+	if exit_code == 0 then
+		-- Success - just show brief message, no notification popup
+		vim.schedule(function()
+			vim.api.nvim_echo({ { "✓ Compiled: " .. output_name, "String" } }, false, {})
+		end)
+		return output_path
+	else
+		-- Show compilation errors in notification (async to avoid blocking)
+		vim.schedule(function()
+			vim.notify(
+				"Compilation failed!\n\n" .. result,
+				vim.log.levels.ERROR,
+				{ title = "CUDA Compile", timeout = 10000 }
+			)
+		end)
+		return nil
+	end
+end
+
+function M.cuda_debug()
+	-- Compile first
+	local executable = M.cuda_compile()
+
+	if not executable then
+		-- Compilation failed, don't start debugging
+		return
+	end
+
+	-- Compilation succeeded, start debugging
+	local dap = require("dap")
+
+	-- Set up a temporary configuration for this specific executable
+	dap.run({
+		type = "cuda_gdb",
+		request = "launch",
+		name = "Debug " .. vim.fn.fnamemodify(executable, ":t"),
+		program = executable,
+		cwd = vim.fn.getcwd(),
+		stopAtBeginningOfMainSubprogram = false,
+	})
+end
+
+function M.cuda_restart()
+	local dap = require("dap")
+
+	-- Check if a debug session is running
+	local session = dap.session()
+	if session then
+		-- Stop current session, then restart after a brief delay
+		dap.terminate()
+		-- Give it a moment to clean up
+		vim.defer_fn(function()
+			M.cuda_debug()
+		end, 100)
+	else
+		-- No session running, just start debugging
+		M.cuda_debug()
+	end
+end
+
 return M

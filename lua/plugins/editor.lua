@@ -135,6 +135,7 @@ return {
 
 	{
 		"saghen/blink.cmp",
+		build = "cargo build --release",
 		opts = function(_, opts)
 			-- Initialize toggle variable
 			if vim.g.blink_cmp_enabled == nil then

@@ -91,6 +91,30 @@ return {
 				end,
 				desc = "Hover Variables",
 			},
+			{
+				"<leader>md",
+				function()
+					require("util.debug").cuda_debug()
+				end,
+				desc = "CUDA Compile + Debug",
+				mode = "n",
+			},
+			{
+				"<leader>mM",
+				function()
+					require("util.debug").cuda_compile()
+				end,
+				desc = "CUDA Compile Only",
+				mode = "n",
+			},
+			{
+				"<leader>mr",
+				function()
+					require("util.debug").cuda_restart()
+				end,
+				desc = "CUDA Restart (stop + recompile + debug)",
+				mode = "n",
+			},
 		},
 		config = function()
 			local dap = require("dap")
@@ -133,16 +157,35 @@ return {
 				},
 			})
 
-			-- Automatically open/close dap-ui
+			-- Automatically open dap-ui on first launch, but keep it open between sessions
 			dap.listeners.before.launch.dapui_config = function()
 				dapui.open()
 			end
-			dap.listeners.before.event_terminated.dapui_config = function()
-				dapui.close()
-			end
-			dap.listeners.before.event_exited.dapui_config = function()
-				dapui.close()
-			end
+			-- Don't auto-close on terminate/exit - prevents screen lag during iterative debugging
+			-- Use <leader>mu to manually close when done with entire debug session
+
+			-- Create user commands for CUDA debugging (must start with uppercase)
+			vim.api.nvim_create_user_command("Jf", function()
+				require("util.debug").cuda_restart()
+			end, { desc = "CUDA: Restart (stop + recompile + debug)" })
+
+			vim.api.nvim_create_user_command("Cr", function()
+				require("util.debug").cuda_restart()
+			end, { desc = "CUDA: Restart (stop + recompile + debug)" })
+
+			vim.api.nvim_create_user_command("Cd", function()
+				require("util.debug").cuda_debug()
+			end, { desc = "CUDA: Compile + debug" })
+
+			vim.api.nvim_create_user_command("Cc", function()
+				require("util.debug").cuda_compile()
+			end, { desc = "CUDA: Compile only" })
+
+			-- Create command abbreviations so you can type lowercase without shift
+			vim.cmd("cabbrev jf Jf")
+			vim.cmd("cabbrev cr Cr")
+			vim.cmd("cabbrev cd Cd")
+			vim.cmd("cabbrev cc Cc")
 
 			-- Setup virtual text
 			require("nvim-dap-virtual-text").setup({
@@ -173,6 +216,44 @@ return {
 			)
 			vim.fn.sign_define("DapLogPoint", { text = "L", texthl = "DiagnosticInfo", linehl = "", numhl = "" })
 			vim.fn.sign_define("DapStopped", { text = ">", texthl = "DiagnosticWarn", linehl = "", numhl = "" })
+
+			-- CUDA debugging with cuda-gdb
+			dap.adapters.cuda_gdb = {
+				type = "executable",
+				command = "cuda-gdb",
+				args = { "-i", "dap" },
+			}
+
+			dap.configurations.cuda = {
+				{
+					name = "Launch CUDA Program",
+					type = "cuda_gdb",
+					request = "launch",
+					program = function()
+						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+					end,
+					cwd = "${workspaceFolder}",
+					stopAtBeginningOfMainSubprogram = false,
+				},
+				{
+					name = "Launch CUDA Program (with args)",
+					type = "cuda_gdb",
+					request = "launch",
+					program = function()
+						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+					end,
+					args = function()
+						local args_string = vim.fn.input("Arguments: ")
+						return vim.split(args_string, " +")
+					end,
+					cwd = "${workspaceFolder}",
+					stopAtBeginningOfMainSubprogram = false,
+				},
+			}
+
+			-- Also use cuda-gdb for C/C++ files that might contain CUDA code
+			dap.configurations.cpp = dap.configurations.cuda
+			dap.configurations.c = dap.configurations.cuda
 
 			-- Rust adapter is handled by rustaceanvim automatically
 			-- It integrates with nvim-dap without additional configuration
