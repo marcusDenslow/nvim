@@ -22,6 +22,9 @@ return {
 					fg = "#ffffff",
 				},
 			},
+			tweak_ui = {
+				enable_end_of_buffer = true,
+			},
 		},
 	},
 

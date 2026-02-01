@@ -138,12 +138,12 @@ return {
 				layouts = {
 					{
 						elements = {
-							{ id = "scopes", size = 0.25 },
-							{ id = "breakpoints", size = 0.25 },
-							{ id = "stacks", size = 0.25 },
-							{ id = "watches", size = 0.25 },
+							{ id = "scopes", size = 0.50 },  -- More space for locals/GPU variables
+							{ id = "breakpoints", size = 0.20 },
+							{ id = "stacks", size = 0.20 },
+							{ id = "watches", size = 0.10 },
 						},
-						size = 40,
+						size = 60,  -- Wider sidebar for better variable viewing
 						position = "left",
 					},
 					{
